@@ -1,0 +1,53 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "birddog"
+version = "0.1.0"
+description = "Domain allowlist, per-domain rate caps, response audit, and a Streamlit dashboard for Bright Data scraping agents. The picks-and-shovels layer for any agent that consumes the live web."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Mukunda Rao Katta", email = "mukunda.vjcs6@gmail.com" }]
+keywords = [
+  "ai",
+  "llm",
+  "agents",
+  "bright-data",
+  "scraping",
+  "web-data",
+  "egress",
+  "audit",
+  "rate-limit",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+  "httpx>=0.27",
+]
+
+[project.optional-dependencies]
+dashboard = ["streamlit>=1.40", "pandas>=2.2"]
+brightdata = []  # Bright Data uses standard HTTP+proxy; no extra SDK needed
+dev = ["pytest>=8.0", "ruff>=0.4", "respx>=0.21", "streamlit>=1.40", "pandas>=2.2"]
+
+[project.urls]
+Homepage = "https://github.com/MukundaKatta/birddog"
+Source = "https://github.com/MukundaKatta/birddog"
+Issues = "https://github.com/MukundaKatta/birddog/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/birddog"]
