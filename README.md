@@ -1,5 +1,9 @@
 # birddog
 
+[![PyPI](https://img.shields.io/pypi/v/birddog.svg)](https://pypi.org/project/birddog/)
+
+![demo](docs/demo.gif)
+
 Audited Bright Data egress for AI agents. Drop one context manager
 around an agent that scrapes the web and you get:
 
