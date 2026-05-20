@@ -101,15 +101,36 @@ streamlit run -m birddog.dashboard -- --audit runs/scrape.jsonl
 Shows total fetches, denials, bytes, and a per-host breakdown of
 fetches + bytes + p50 latency.
 
-## Demo
+## Demos
+
+Two runnable examples in `examples/`:
+
+**1. Smoke test — `scrape_demo.py`**
 
 ```bash
 python examples/scrape_demo.py
 ```
 
-Runs offline against an `httpx.MockTransport` fake of Bright Data, so
-you can see the allowlist, rate limit, and audit log behavior without
-a real account.
+Hits each feature once: happy path, domain denial, rate-limit burst,
+summary. Offline via `httpx.MockTransport`.
+
+**2. Realistic agent — `watchdog_agent.py`**
+
+```bash
+python examples/watchdog_agent.py
+```
+
+A small price-tracker agent. Polls a watchlist of product pages,
+extracts prices, alerts when something moves more than a per-product
+threshold. Three passes show:
+
+- allowlist denials (off-domain mirror URL is dropped)
+- per-domain rate cap kicking in on pass 3
+- threshold alerts (`Δ -6.4% > 3.0%`)
+- a `runs/watchdog.jsonl` audit log you can dashboard
+
+Set `BIRDDOG_USE_BRIGHTDATA=1` + your Bright Data Web Unlocker env
+vars to flip the demo to a real proxy.
 
 ## Companion libraries
 
