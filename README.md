@@ -4,19 +4,20 @@
 
 ![demo](docs/demo.gif)
 
-Audited Bright Data egress for AI agents. Drop one context manager
-around an agent that scrapes the web and you get:
+**A leash for AI scraping agents.** One context manager wraps an agent
+that hits the web and gives you:
 
-1. **Domain allowlist** — deny everything outside it, log the attempt
-2. **Per-domain rate caps** — simple token bucket per host
-3. **Response audit log** — one JSONL line per fetch (url, status, bytes, ms)
-4. **Bright Data Web Unlocker proxy** — opt-in: route via Bright Data
-5. **Streamlit dashboard** — point it at the JSONL, get per-host bytes,
-   denial counts, latency p50
+1. **Domain allowlist** with wildcard subdomains, deny everything else
+2. **Per-domain rate caps** via token bucket, one bucket per host
+3. **JSONL audit log** with one line per fetch (url, status, bytes, ms)
+4. **Bright Data Web Unlocker proxy** as an opt-in flag
+5. **Streamlit dashboard** that reads the JSONL and shows per-host bytes,
+   denials, and p50 latency
 
-Built for the kind of agent that hits live sites: research bots, price
-trackers, RAG ingest jobs. If you've ever watched an agent rip
-through a sponsor's free tier in 30 seconds, this is for you.
+Built for research bots, price trackers, and RAG ingest jobs that hit
+live sites. If you have watched an agent burn through a Bright Data
+quota in 30 seconds because it wandered off-domain or hammered one
+host, that is what birddog stops.
 
 ## Install
 
