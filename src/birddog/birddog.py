@@ -112,6 +112,7 @@ class Birddog:
     audit_path: str | None = None
     bright_data: dict[str, str] | None = None  # {"host": "...", "username": "...", "password": "..."}
     timeout_seconds: float = 30.0
+    attest: Any = None  # Optional birddog.attest.AttestConfig; on-close attestation via mantle-agent-attest
 
     def session(
         self, session_id: str | None = None
@@ -306,6 +307,40 @@ class _SessionCM:
                 },
             )
         )
+
+        # Optional on-close attestation via mantle-agent-attest. Runs after
+        # session_close so the attested JSONL covers the full run.
+        if self._bd.attest is not None and self._bd.audit_path:
+            from birddog.attest import attest_jsonl, emit_attestation_event
+
+            # Flush + close the audit file before reading it back to attest.
+            if self._audit_fp is not None:
+                self._audit_fp.flush()
+                self._audit_fp.close()
+                self._audit_fp = None
+            try:
+                attestation = attest_jsonl(
+                    self._bd.audit_path, self._bd.attest, self._session.id
+                )
+                # Reopen append for one final event so consumers see the root.
+                fp = open(self._bd.audit_path, "a", encoding="utf-8")
+                try:
+                    emit_attestation_event(fp, self._session.id, attestation)
+                finally:
+                    fp.close()
+            except Exception as e:
+                # Don't let attestation failure kill the user's program.
+                # Write a failure event so the log is honest.
+                fp = open(self._bd.audit_path, "a", encoding="utf-8")
+                try:
+                    emit_attestation_event(
+                        fp,
+                        self._session.id,
+                        {"attestation_error": str(e), "submitted_on_chain": False},
+                    )
+                finally:
+                    fp.close()
+
         self._http.close()
         if self._audit_fp is not None:
             self._audit_fp.close()

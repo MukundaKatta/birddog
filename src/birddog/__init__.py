@@ -50,7 +50,15 @@ from .birddog import (
     RateLimitedError,
 )
 
+# AttestConfig is re-exported as a convenience; the actual implementation
+# only imports mantle-agent-attest lazily.
+try:
+    from .attest import AttestConfig
+except Exception:  # pragma: no cover - import guard
+    AttestConfig = None  # type: ignore[assignment]
+
 __all__ = [
+    "AttestConfig",
     "AuditEvent",
     "Birddog",
     "BirddogError",

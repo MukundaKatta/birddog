@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "birddog"
-version = "0.1.0"
-description = "Domain allowlist, per-domain rate caps, response audit, and a Streamlit dashboard for Bright Data scraping agents. The picks-and-shovels layer for any agent that consumes the live web."
+version = "0.2.0"
+description = "Audited Bright Data egress for AI scraping agents. Domain allowlist, per-domain rate caps, JSONL audit, Streamlit dashboard, optional Web Unlocker proxy, and optional on-close Merkle attestation via mantle-agent-attest."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
@@ -42,7 +42,8 @@ dependencies = [
 [project.optional-dependencies]
 dashboard = ["streamlit>=1.40", "pandas>=2.2"]
 brightdata = []  # Bright Data uses standard HTTP+proxy; no extra SDK needed
-dev = ["pytest>=8.0", "ruff>=0.4", "respx>=0.21", "streamlit>=1.40", "pandas>=2.2"]
+attest = ["mantle-agent-attest>=0.1.0"]  # optional on-close attestation
+dev = ["pytest>=8.0", "ruff>=0.4", "respx>=0.21", "streamlit>=1.40", "pandas>=2.2", "mantle-agent-attest>=0.1.0"]
 
 [project.urls]
 Homepage = "https://github.com/MukundaKatta/birddog"
