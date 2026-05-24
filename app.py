@@ -12,7 +12,7 @@ import sys
 
 # Point the dashboard at the bundled sample log. The dashboard reads
 # from --audit so we hand it argv directly.
-DEFAULT_AUDIT = os.environ.get("BIRDDOG_AUDIT", "runs/scrape_demo.jsonl")
+DEFAULT_AUDIT = os.environ.get("BIRDDOG_AUDIT", "demo_data/dashboard-fixture.jsonl")
 sys.argv = [sys.argv[0], "--audit", DEFAULT_AUDIT]
 
 from birddog.dashboard import main  # noqa: E402

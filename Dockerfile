@@ -19,7 +19,7 @@ RUN pip install --no-cache-dir ".[dashboard]"
 # Copy the entrypoint + bundled sample audit log last so tweaks don't
 # bust the deps layer.
 COPY app.py ./
-COPY runs ./runs
+COPY demo_data ./demo_data
 
 EXPOSE 8080
 
