@@ -1,5 +1,5 @@
 """Core Birddog session: domain allowlist + per-domain rate cap + audit
-+ optional Bright Data Web Unlocker proxy routing.
++ optional Bright Data Web Unlocker or Nimble proxy routing.
 
 Synchronous (httpx.Client). Async (httpx.AsyncClient) would mirror this
 straightforwardly; left out of v0.1 to keep the surface narrow."""
@@ -59,8 +59,8 @@ class FetchResult:
     """What `session.fetch(...)` returns. Compact by design.
 
     `text` and `content` are the response body; `headers` is a copy of
-    response headers; `via_brightdata` records whether the fetch went
-    through the configured Bright Data proxy."""
+    response headers; `via_brightdata` / `via_nimble` record which proxy
+    (if any) routed the fetch."""
 
     url: str
     status: int
@@ -68,6 +68,7 @@ class FetchResult:
     headers: dict[str, str]
     elapsed_ms: float
     via_brightdata: bool
+    via_nimble: bool = False
 
     @property
     def bytes_len(self) -> int:
@@ -110,7 +111,8 @@ class Birddog:
     per_domain_qps: float | None = 1.0
     per_domain_burst: float = 3.0
     audit_path: str | None = None
-    bright_data: dict[str, str] | None = None  # {"host": "...", "username": "...", "password": "..."}
+    bright_data: dict[str, str] | None = None  # {"host": "brd.superproxy.io:33335", "username": "...", "password": "..."}
+    nimble: dict[str, str] | None = None  # {"username": "account-X-pipeline-Y", "password": "..."}; routes via ip.nimbleway.com:7000
     timeout_seconds: float = 30.0
     attest: Any = None  # Optional birddog.attest.AttestConfig; on-close attestation via mantle-agent-attest
 
@@ -244,6 +246,7 @@ class BirddogSession:
             headers=dict(resp.headers),
             elapsed_ms=elapsed_ms,
             via_brightdata=self._bd.bright_data is not None,
+            via_nimble=self._bd.nimble is not None,
         )
 
     # ---- introspection ----
@@ -278,17 +281,33 @@ class _SessionCM:
             os.makedirs(os.path.dirname(os.path.abspath(self._bd.audit_path)) or ".", exist_ok=True)
             self._audit_fp = open(self._bd.audit_path, "a", encoding="utf-8")
 
-        # httpx client (optionally routed through Bright Data Web Unlocker proxy)
+        # httpx client — optionally routed through Bright Data or Nimble proxy
         if self._bd.bright_data:
             bd = self._bd.bright_data
             proxy = f"http://{bd['username']}:{bd['password']}@{bd['host']}"
+            self._http = httpx.Client(proxy=proxy, verify=False, follow_redirects=True)
+        elif self._bd.nimble:
+            nm = self._bd.nimble
+            proxy = f"http://{nm['username']}:{nm['password']}@ip.nimbleway.com:7000"
             self._http = httpx.Client(proxy=proxy, verify=False, follow_redirects=True)
         else:
             self._http = httpx.Client(follow_redirects=True)
 
         self._session = BirddogSession(self._bd, self._session_id, self._audit_fp, self._http)
+        proxy_label = (
+            "bright_data" if self._bd.bright_data
+            else "nimble" if self._bd.nimble
+            else None
+        )
         self._session._emit(
-            AuditEvent(ts=time.time(), session_id=self._session.id, kind="session_open")
+            AuditEvent(
+                ts=time.time(),
+                session_id=self._session.id,
+                kind="session_open",
+                extra={"via_brightdata": self._bd.bright_data is not None,
+                       "via_nimble": self._bd.nimble is not None,
+                       "proxy": proxy_label},
+            )
         )
         return self._session
 

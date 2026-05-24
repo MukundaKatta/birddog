@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "birddog"
-version = "0.2.0"
-description = "Audited Bright Data egress for AI scraping agents. Domain allowlist, per-domain rate caps, JSONL audit, Streamlit dashboard, optional Web Unlocker proxy, and optional on-close Merkle attestation via mantle-agent-attest."
+version = "0.2.1"
+description = "Audited web egress for AI scraping agents. Domain allowlist, per-domain rate caps, JSONL audit, Streamlit dashboard, optional Bright Data Web Unlocker or Nimble proxy, and optional on-close Merkle attestation via mantle-agent-attest."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }

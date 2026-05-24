@@ -11,7 +11,8 @@ that hits the web and gives you:
 2. **Per-domain rate caps** via token bucket, one bucket per host
 3. **JSONL audit log** with one line per fetch (url, status, bytes, ms)
 4. **Bright Data Web Unlocker proxy** as an opt-in flag
-5. **Streamlit dashboard** that reads the JSONL and shows per-host bytes,
+5. **Nimble proxy** as an alternative opt-in proxy
+6. **Streamlit dashboard** that reads the JSONL and shows per-host bytes,
    denials, and p50 latency
 
 Built for research bots, price trackers, and RAG ingest jobs that hit
@@ -41,11 +42,11 @@ and burn through a Bright Data quota in a single run.
 | Wandering off-domain  | Allowlist with `example.com` + `*.example.com`     |
 | Burst scraping        | Token bucket per host (qps + burst)                |
 | "What did it fetch?"  | JSONL audit log, one event per fetch               |
-| Anti-bot blocks       | Optional Bright Data Web Unlocker proxy            |
+| Anti-bot blocks       | Optional Bright Data Web Unlocker or Nimble proxy  |
 | Post-run review       | Bundled Streamlit dashboard                        |
 
 It does **not** parse HTML, manage cookies, render JS, or rotate user
-agents. That's what Bright Data + your scraping code are for.
+agents. That's what Bright Data / Nimble + your scraping code are for.
 
 ## Usage
 
@@ -77,8 +78,27 @@ with bd.session("research-bot") as s:
 ```
 
 `FetchResult` carries `url`, `status`, `text`, `headers`, `elapsed_ms`,
-and a `via_brightdata` flag so downstream code can tell whether the
-response came through the proxy.
+`via_brightdata`, and `via_nimble` flags so downstream code can tell
+which proxy (if any) routed the response.
+
+### Nimble proxy
+
+```python
+bd = Birddog(
+    allowed_domains={"*.example.com"},
+    per_domain_qps=2.0,
+    audit_path="runs/scrape.jsonl",
+    # Route through Nimble instead of Bright Data:
+    nimble={
+        "username": "account-myaccount-pipeline-mypipeline",
+        "password": "...",
+    },
+)
+```
+
+`nimble` and `bright_data` are mutually exclusive; whichever is set
+routes all fetches through `ip.nimbleway.com:7000` or
+`brd.superproxy.io:33335` respectively.
 
 ## Audit log
 

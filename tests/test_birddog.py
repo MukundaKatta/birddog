@@ -191,3 +191,40 @@ def test_http_error_is_logged(tmp_path):
 
     events = [json.loads(line) for line in audit.read_text().splitlines()]
     assert any(e["kind"] == "fetch_failed" for e in events)
+
+
+# ---- nimble proxy config ---------------------------------------------------
+
+
+def test_nimble_config_sets_via_nimble(tmp_path):
+    """Birddog.nimble config → FetchResult.via_nimble=True."""
+    bd = Birddog(
+        allowed_domains={"example.com"},
+        per_domain_qps=None,
+        nimble={"username": "account-test-pipeline-p", "password": "secret"},
+    )
+    s = _make_session(bd)
+    try:
+        r = s.fetch("https://example.com/page")
+        assert r.via_nimble is True
+        assert r.via_brightdata is False
+    finally:
+        _close(s)
+
+
+def test_nimble_session_open_records_proxy(tmp_path):
+    """session_open extra should carry via_nimble=True when nimble config present."""
+    audit = tmp_path / "a.jsonl"
+    bd = Birddog(
+        allowed_domains={"example.com"},
+        per_domain_qps=None,
+        audit_path=str(audit),
+        nimble={"username": "account-test-pipeline-p", "password": "secret"},
+    )
+    s = _make_session(bd)
+    _close(s)
+
+    events = [json.loads(line) for line in audit.read_text().splitlines() if line.strip()]
+    open_ev = next(e for e in events if e["kind"] == "session_open")
+    assert open_ev["extra"]["via_nimble"] is True
+    assert open_ev["extra"]["proxy"] == "nimble"
