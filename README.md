@@ -106,9 +106,22 @@ streamlit run -m birddog.dashboard -- --audit runs/scrape.jsonl
 Shows total fetches, denials, bytes, and a per-host breakdown of
 fetches + bytes + p50 latency.
 
+![dashboard](docs/dashboard.png)
+
 ## Demos
 
-Two runnable examples in `examples/`:
+**Try it in Jupyter:** `examples/birddog_walkthrough.ipynb` is a
+guided notebook tour (offline `httpx.MockTransport`) covering the
+allowlist + rate cap + audit log + pandas + matplotlib aggregation,
+plus a commented Bright Data wiring cell. Open it after installing
+the notebook extras:
+
+```bash
+pip install -e ".[notebook]"
+jupyter notebook examples/birddog_walkthrough.ipynb
+```
+
+Two runnable scripts in `examples/`:
 
 **1. Smoke test — `scrape_demo.py`**
 

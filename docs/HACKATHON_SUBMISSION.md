@@ -33,12 +33,14 @@ Why this is different from a stock scraper or a logging wrapper:
 
 The repo includes a real demo: a small watchdog price tracker that polls a list of product pages, extracts prices, and alerts on changes above a per-product threshold. Three passes show allowlist denials on a rogue mirror URL, the per-domain rate cap kicking in, threshold alerts, and a JSONL audit log you can dashboard immediately. Set BIRDDOG_USE_BRIGHTDATA=1 plus the standard env vars to flip the same demo onto a real Web Unlocker zone.
 
+For reviewers who prefer a guided tour, `examples/birddog_walkthrough.ipynb` is an executed Jupyter notebook that walks through allowlist denial, rate-limit denial, audit log aggregation in pandas, a matplotlib bar chart, and a commented Bright Data wiring cell. The notebook runs offline through httpx.MockTransport so it is reproducible without a live Bright Data zone.
+
 13 tests, MIT licensed, Python 3.10 and up, single runtime dependency (httpx). pip install birddog and you get the core library. pip install "birddog[dashboard]" adds the Streamlit dashboard.
 
 Repo: https://github.com/MukundaKatta/birddog
 
 ## Built with
-Python, httpx, Bright Data Web Unlocker, Streamlit, pandas
+Python, httpx, Bright Data Web Unlocker, Streamlit, pandas, matplotlib, Jupyter
 
 ## How does it use Bright Data
 Optional Web Unlocker proxy routing. Pass host + username + password to the Birddog config and every fetch in the session goes through Bright Data's proxy. The audit log records a `via_brightdata` flag per fetch so downstream tooling can prove which traffic went through the Unlocker.
@@ -52,8 +54,8 @@ Length target: under 3 minutes. Show:
 4. Editor: open `src/birddog/birddog.py` to the `fetch` method. Read the three-gate flow out loud (allowlist, bucket, fetch). (30 seconds)
 5. Closing line: "One context manager, four gates, one audit log. Drop it around any agent that hits Bright Data."
 
-## Cover image idea
-Screenshot of the Streamlit dashboard showing four metric boxes (fetches ok, domain denied, rate denied, bytes) with the per-host table below.
+## Cover image
+`docs/dashboard.png` - captured headless screenshot of the Streamlit dashboard showing the four metric boxes (Fetches OK 24, Denied domain 9, Denied rate 3, Total bytes 3732), the per-host table, and the recent events feed against the bundled `runs/watchdog.jsonl` sample.
 
 ## Tags (lablab submission)
 ai-agents, bright-data, web-scraping, observability, rate-limiting, python, llm-tooling
