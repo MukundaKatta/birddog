@@ -2,7 +2,7 @@
 
 Hackathon: Web Data UNLOCKED (May 25 to 31, 2026)
 Host: lablab.ai (Bright Data sponsor track)
-Submission URL (expected): https://lablab.ai/event/web-data-unlocked-hackathon/submit
+Event page: https://lablab.ai/ai-hackathons/brightdata-ai-agents-web-data-hackathon (enroll there, then submit via the button on that page)
 GitHub: https://github.com/MukundaKatta/birddog
 
 ## Title
@@ -35,7 +35,7 @@ The repo includes a real demo: a small watchdog price tracker that polls a list 
 
 For reviewers who prefer a guided tour, `examples/birddog_walkthrough.ipynb` is an executed Jupyter notebook that walks through allowlist denial, rate-limit denial, audit log aggregation in pandas, a matplotlib bar chart, and a commented Bright Data wiring cell. The notebook runs offline through httpx.MockTransport so it is reproducible without a live Bright Data zone.
 
-13 tests, MIT licensed, Python 3.10 and up, single runtime dependency (httpx). pip install birddog and you get the core library. pip install "birddog[dashboard]" adds the Streamlit dashboard.
+15 tests, MIT licensed, Python 3.10 and up, single runtime dependency (httpx). pip install birddog and you get the core library. pip install "birddog[dashboard]" adds the Streamlit dashboard.
 
 Repo: https://github.com/MukundaKatta/birddog
 
