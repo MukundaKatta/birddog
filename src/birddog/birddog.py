@@ -16,6 +16,9 @@ from urllib.parse import urlparse
 
 import httpx
 
+from ._core import TokenBucket as _Bucket
+from ._core import host_allowed as _host_allowed
+
 
 # ---- Errors ----------------------------------------------------------------
 
@@ -75,29 +78,9 @@ class FetchResult:
         return len(self.text.encode("utf-8", errors="ignore"))
 
 
-# ---- Token bucket per host -------------------------------------------------
-
-
-class _Bucket:
-    """Tiny token-bucket. Capacity = burst; refill_per_sec = sustained QPS."""
-
-    __slots__ = ("_capacity", "_refill", "_tokens", "_last")
-
-    def __init__(self, capacity: float, refill_per_sec: float):
-        self._capacity = capacity
-        self._refill = refill_per_sec
-        self._tokens = capacity
-        self._last = time.monotonic()
-
-    def try_take(self, cost: float = 1.0) -> bool:
-        now = time.monotonic()
-        elapsed = now - self._last
-        self._last = now
-        self._tokens = min(self._capacity, self._tokens + elapsed * self._refill)
-        if self._tokens >= cost:
-            self._tokens -= cost
-            return True
-        return False
+# Token-bucket rate limiting (``_Bucket``) and the allowlist matcher
+# (``_host_allowed``) now live in the dependency-free ``birddog._core``
+# module and are imported at the top of this file.
 
 
 # ---- Birddog (config) ------------------------------------------------------
@@ -153,13 +136,7 @@ class BirddogSession:
     # ---- allowlist ----
 
     def _host_allowed(self, host: str) -> bool:
-        for pat in self._bd.allowed_domains:
-            if pat == host:
-                return True
-            if pat.startswith("*."):
-                if host.endswith(pat[1:]):
-                    return True
-        return False
+        return _host_allowed(self._bd.allowed_domains, host)
 
     # ---- fetch ----
 

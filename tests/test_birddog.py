@@ -1,15 +1,26 @@
-"""Tests for birddog.Birddog using httpx.MockTransport."""
+"""Tests for birddog.Birddog using httpx.MockTransport.
+
+This is the full integration suite and needs the third-party ``httpx`` and
+``pytest`` dependencies (installed via the ``[dev]`` extra). It is written
+for pytest. When those dependencies are missing the whole module is skipped
+so that a plain ``python3 -m unittest discover -s tests`` run still passes
+(see ``tests/test_core.py`` / ``tests/test_pure.py`` for the
+dependency-free, stdlib-only suite that always runs)."""
 
 from __future__ import annotations
 
 import json
 import time
+import unittest
 
-import httpx
-import pytest
+try:
+    import httpx
+    import pytest
 
-from birddog import Birddog, DomainDeniedError, RateLimitedError
-from birddog.birddog import BirddogSession
+    from birddog import Birddog, DomainDeniedError, RateLimitedError
+    from birddog.birddog import BirddogSession
+except ImportError as exc:  # pragma: no cover - exercised only without deps
+    raise unittest.SkipTest(f"integration deps unavailable: {exc}") from exc
 
 
 def _ok_handler(request: httpx.Request) -> httpx.Response:
