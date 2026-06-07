@@ -170,6 +170,47 @@ threshold. Three passes show:
 Set `BIRDDOG_USE_BRIGHTDATA=1` + your Bright Data Web Unlocker env
 vars to flip the demo to a real proxy.
 
+## Development & testing
+
+birddog ships two test suites:
+
+**1. Dependency-free suite (standard library only).** Runs with nothing
+but a Python interpreter — no `pip install`, no third-party deps. It
+exercises the security-critical pure logic (the domain allowlist matcher
+and the per-host token bucket in `birddog._core`) plus the stdlib audit
+helpers:
+
+```bash
+python3 -m unittest discover -s tests
+```
+
+**2. Full integration suite (pytest + httpx).** Drives a real
+`Birddog.session()` over `httpx.MockTransport`, including the optional
+attestation hook. Install the dev extra first:
+
+```bash
+pip install -e ".[dev]"
+pytest -q
+```
+
+When the dev dependencies are absent, the pytest modules skip cleanly so
+the stdlib `unittest` run still passes.
+
+### Reusable primitives
+
+The two leash primitives are dependency-free and importable on their own:
+
+```python
+from birddog._core import host_allowed, TokenBucket
+
+host_allowed({"*.example.com"}, "shop.example.com")  # True
+host_allowed({"*.example.com"}, "example.com")       # False (apex, not a subdomain)
+host_allowed({"Docs.BrightData.com"}, "docs.brightdata.com")  # True (case-insensitive)
+
+bucket = TokenBucket(capacity=2.0, refill_per_sec=1.0)
+bucket.try_take()  # True until the burst is spent, then False until refilled
+```
+
 ## Companion libraries
 
 `birddog` is the egress half of a small agent-stack:

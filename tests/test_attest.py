@@ -1,15 +1,23 @@
 """Tests for the optional `attest` hook on Birddog._SessionCM.
 
-Requires `mantle-agent-attest` (pulled in by the [dev] extra)."""
+Requires `mantle-agent-attest`, `httpx` and `pytest` (pulled in by the
+[dev] extra). When those are missing the module is skipped so a plain
+``python3 -m unittest discover -s tests`` run still passes; the
+dependency-free attestation helpers are covered by
+``tests/test_pure.py``."""
 
 from __future__ import annotations
 
 import json
+import unittest
 
-import httpx
-import pytest
+try:
+    import httpx
+    import pytest
 
-from birddog import AttestConfig, Birddog
+    from birddog import AttestConfig, Birddog
+except ImportError as exc:  # pragma: no cover - exercised only without deps
+    raise unittest.SkipTest(f"attestation deps unavailable: {exc}") from exc
 
 
 # Same MockTransport trick used by tests/test_birddog.py
