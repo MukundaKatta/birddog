@@ -40,11 +40,11 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dashboard = ["streamlit>=1.40", "pandas>=2.2"]
+dashboard = ["streamlit>=1.40", "pandas>=2.3.3"]
 brightdata = []  # Bright Data uses standard HTTP+proxy; no extra SDK needed
 attest = ["mantle-agent-attest>=0.1.0"]  # optional on-close attestation
-notebook = ["jupyter>=1.0", "pandas>=2.0", "matplotlib>=3.7"]
-dev = ["pytest>=8.0", "ruff>=0.4", "respx>=0.21", "streamlit>=1.40", "pandas>=2.2", "mantle-agent-attest>=0.1.0"]
+notebook = ["jupyter>=1.0", "pandas>=2.3.3", "matplotlib>=3.7"]
+dev = ["pytest>=8.0", "ruff>=0.4", "respx>=0.21", "streamlit>=1.40", "pandas>=2.3.3", "mantle-agent-attest>=0.1.0"]
 
 [project.urls]
 Homepage = "https://github.com/MukundaKatta/birddog"
